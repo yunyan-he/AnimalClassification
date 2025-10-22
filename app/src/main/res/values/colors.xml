@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <!-- 主色调：浅灰色背景 -->
+    <color name="colorPrimary">#F4ECEC</color> <!-- 浅灰色背景 -->
+    <color name="colorAccent1">#7A7979</color> <!-- 中性灰色，用作按钮背景或强调色 -->
+    <color name="colorAccent2">#A37272</color>>
+
+    <!-- 其他颜色 -->
+    <color name="colorBackground">#FFFFFF</color> <!-- 白色背景 -->
+    <color name="colorTextPrimary">#333333</color> <!-- 深灰色文本 -->
+    <color name="colorTextSecondary">#777777</color> <!-- 灰色次级文本 -->
+    <color name="colorBorder">#DDDDDD</color> <!-- 浅灰色边框 -->
+    <color name="colorButtonText">#FFFFFF</color> <!-- 按钮文字白色 -->
+</resources>
