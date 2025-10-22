@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         if (granted) {
             dispatchTakePictureIntent()
         } else {
-            showToast("未授予相机权限，无法拍照")
+            showToast("Camera permission not granted, unable to take a picture")
         }
     }
 
@@ -45,12 +45,12 @@ class MainActivity : AppCompatActivity() {
         if (success) {
             handleImageResult(photoUri)
         } else {
-            showToast("拍照取消")
+            showToast("Photo capture cancelled")
         }
     }
 
     private val pickPicture = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { handleImageResult(it) } ?: showToast("选图取消")
+        uri?.let { handleImageResult(it) } ?: showToast("Image selection cancelled")
     }
 
     // binding 为什么用viewbinding 不用r.id 是为什么?
@@ -72,9 +72,9 @@ class MainActivity : AppCompatActivity() {
         binding.galleryButton.setOnClickListener { dispatchSelectPictureIntent() }
         binding.infoIcon.setOnClickListener {
             android.app.AlertDialog.Builder(this)
-                .setTitle("深入识别说明")
-                .setMessage("默认情况下，系统会先进行粗略识别（如猫/狗）。如果勾选此选项，识别出猫或狗后，系统会进一步分析猫或狗的具体品种。")
-                .setPositiveButton("明白了") { dialog, _ -> dialog.dismiss() }
+                .setTitle("About Detailed Recognition")
+                .setMessage("By default, the app performs a basic recognition (e.g., cat/dog). If you check this option, after identifying a cat or dog, the system will further analyze its specific breed.")
+                .setPositiveButton("Got it") { dialog, _ -> dialog.dismiss() }
                 .show()
         }
     }
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
             photoUri = FileProvider.getUriForFile(this, FILE_PROVIDER_AUTHORITY, photoFile)
             takePicture.launch(photoUri)
         } catch (e: Exception) {
-            showToast("无法创建图片文件: ${e.message}")
+            showToast("Could not create image file: ${e.message}")
         }
     }
 
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
 object ImageUtils {
     fun createImageFile(context: Context): File {
         val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            ?: throw IllegalStateException("无法获取存储目录")
+            ?: throw IllegalStateException("Failed to get storage directory")
         return File.createTempFile("photo_", ".jpg", storageDir)
     }
 }

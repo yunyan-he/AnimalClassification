@@ -137,7 +137,7 @@ class ResultActivity : AppCompatActivity() {
                 showResult()
                 bitmap.recycle()
             } catch (e: Exception) {
-                handleError("网络异常，请稍后重试 ${e.message}")
+                handleError("Network error, please try again later ${e.message}")
             } finally {
                 binding.loadingLayout.visibility = View.GONE
             }
@@ -191,8 +191,8 @@ class ResultActivity : AppCompatActivity() {
                 val index = recognizeAnimal(bitmap, animalModel, "Coarse-grained recognition stage")
                 if (index == UNRECOGNIZED_INDEX) {
                     recognitionState = RecognitionState.Result(
-                        localAnimalType = "未在图片中识别出动物",
-                        localAnimalIntro = "未在图片中识别出动物",
+                        localAnimalType = "Could not recognize an animal in the picture",
+                        localAnimalIntro = "Could not recognize an animal in the picture",
                         localDetailUrl = null
                     )
                     showResult()
@@ -204,8 +204,8 @@ class ResultActivity : AppCompatActivity() {
                 } else null
                 if (detailedIndex == UNRECOGNIZED_INDEX) {
                     recognitionState = RecognitionState.Result(
-                        localAnimalType = "未在图片中识别出动物",
-                        localAnimalIntro = "未在图片中识别出动物",
+                        localAnimalType = "Could not recognize an animal in the picture",
+                        localAnimalIntro = "Could not recognize an animal in the picture",
                         localDetailUrl = null
                     )
                     showResult()
@@ -336,21 +336,21 @@ class ResultActivity : AppCompatActivity() {
     private fun showResult() {
         when (val state = recognitionState) {
             is RecognitionState.Result -> {
-                if (state.localAnimalType == "未在图片中识别出动物") {
-                    binding.recognitionResult.text = "识别结果: 未在图片中识别出动物"
-                    binding.baiduInfo.text = "未在图片中识别出动物"
+                if (state.localAnimalType == "Could not recognize an animal in the picture") {
+                    binding.recognitionResult.text = "Result: Could not recognize an animal in the picture"
+                    binding.baiduInfo.text = "Could not recognize an animal in the picture"
                     binding.btnBaiduApi.visibility = View.GONE
                     binding.btnDetailPage.visibility = View.GONE
                 } else if (state.isShowingBaidu && state.baiduAnimalType != null) {
-                    binding.recognitionResult.text = "识别结果: ${state.baiduAnimalType}"
+                    binding.recognitionResult.text = "Result: ${state.baiduAnimalType}"
                     binding.baiduInfo.text = state.baiduAnimalIntro ?: ""
-                    binding.btnBaiduApi.text = "查看本地识别结果"
+                    binding.btnBaiduApi.text = "View Local Result"
                     binding.btnBaiduApi.visibility = View.VISIBLE
                     binding.btnDetailPage.visibility = View.VISIBLE
                 } else if (state.localAnimalType != null) {
-                    binding.recognitionResult.text = "识别结果: ${state.localAnimalType}"
+                    binding.recognitionResult.text = "Result: ${state.localAnimalType}"
                     binding.baiduInfo.text = state.localAnimalIntro ?: ""
-                    binding.btnBaiduApi.text = "查看百度识别结果"
+                    binding.btnBaiduApi.text = "View Baidu Result"
                     binding.btnBaiduApi.visibility = View.VISIBLE
                     binding.btnDetailPage.visibility = View.VISIBLE
                 } else {

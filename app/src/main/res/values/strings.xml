@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">AnimalClaasification</string>
-    <string name="sample_baike_info">狗，是食肉目犬科 [11]犬属 [13]哺乳动物 [12]，别称犬，与马、牛、羊、猪和鸡并称“六畜” [13]。狗的体型大小、毛色因品种不同而不同，体格匀称；鼻吻部较长；眼呈卵圆形；两耳或竖或垂；四肢矫健，前肢5趾，后肢4趾，具爪，但爪不能伸缩；尾呈环形或镰刀形 [14]。据李时珍《本草纲目》记载：“狗，叩的意思。狗吠声有节奏，如同叩击物体一般，也有人说是因其苟且，故称之为狗 [15]。”
-狗分布于世界各地。狗爱吃肉，也吃狗饲料和人类的饭菜、水果、零食等。狗不会流汗，以张嘴巴、吐舌头排放体内的热气 [16]。狗为季节性单次发情动物，一年内在春季3-5月和秋季9-11月发情，野狗在1-2月时发情，发情期为6-14天 [17]。狗的孕期通常为3个月 [18]，有时一次能够生下十到十二只小狗幼崽；体型较小的品种则每次最多只能生下四五只小狗，一般它们一胎产下一两只幼崽是更为常见的情况 [19]。狗的寿命相对较短，一般为12年左右 [20]。
-有科学家认为狗是由早期人类从灰狼驯化而来，驯养时间在4万年前-1.5万年前，一直发展至今。作为现今饲养率最高的宠物，被称为“人类最忠实的朋友” [21]。其机智勇敢、忠实可靠而且善解人意，用途广泛。正因如此，狗几乎在世界各国都受到宠爱和保护 [22]。在十二生肖中，狗一直是和人们生活最为接近的家畜。经过长期的培育，人们发展其某方面的天赋和特长，以顺应不同的要求和目的，狗的品种在家畜中最为复杂，有培育其为肉食、打猎、看守、侦察、牧羊、表演、赛跑、向导、拉橇、实验及玩赏等各种专门种类 [23]。</string>
+    <string name="sample_baike_info">The dog (Canis lupus familiaris) is a carnivorous mammal of the family Canidae and the genus Canis.
+        It is known as one of the "six domestic animals" along with the horse, ox, sheep, pig, and chicken.
+        The size and coat color of dogs vary by breed, but they generally have a well-proportioned body, a relatively long muzzle, oval-shaped eyes, and ears that can be either erect or drooping.
+        They have strong limbs, with five toes on the front paws and four on the hind paws, equipped with non-retractable claws.
+        Their tails can be curled or sickle-shaped.Dogs are found all over the world. They are primarily meat-eaters but also consume dog food, human leftovers, fruits, and snacks.
+        Dogs do not sweat; instead, they regulate their body temperature by panting with their mouths open and tongues out.
+        They are seasonal monoestrous animals, typically entering heat in the spring (March-May) and autumn (September-November).
+        The gestation period for a dog is usually around three months, and they can sometimes give birth to ten to twelve puppies at once.
+        Smaller breeds may have smaller litters of four or five, with one or two puppies being more common. The lifespan of a dog is relatively short, averaging around 12 years.
+        Scientists believe that dogs were domesticated from gray wolves by early humans between 15,000 and 40,000 years ago.
+        Today, as the most popular pet, they are known as "man's best friend." Dogs are intelligent, brave, loyal, and empathetic, making them useful for a wide range of purposes.
+        For this reason, dogs are loved and protected in almost every country. Through long-term breeding, humans have developed their specific talents and traits for various purposes, making dogs one of the most diverse domestic animals.
+        They have been bred for meat, hunting, guarding, reconnaissance, herding, performance, racing, guidance, sled-pulling, experiments, and companionship.</string>
 </resources>
