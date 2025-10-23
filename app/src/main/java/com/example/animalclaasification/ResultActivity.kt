@@ -29,7 +29,7 @@ import java.util.Collections
 import kotlin.math.min
 
 /**
- * Displays recognition results for an image, using ONNX models for local inference and Baidu API for alternative results.
+ * Displays recognition results for an image, using ONNX models for local inference and Gemini API for alternative results.
  * Allows navigation to an encyclopedia page via WebView.
  */
 class ResultActivity : AppCompatActivity() {
@@ -40,7 +40,7 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var detailedModel: OrtSession
 
     private var recognitionState: RecognitionState = RecognitionState.Initial
-    private val accessToken: String = BuildConfig.ACCESS_TOKEN
+    private val geminiApiKey: String = BuildConfig.GEMINI_API_KEY
 
     companion object {
         private const val TAG = "ResultActivity"
@@ -48,6 +48,12 @@ class ResultActivity : AppCompatActivity() {
         private const val DOG_INDEX = 18
         private const val IMAGE_HEIGHT_DP = 300
         private const val UNRECOGNIZED_INDEX = -1 // Special index for unrecognized animal
+        // This is the prompt will send to Gemini
+        private const val GEMINI_PROMPT = """
+            Identify the animal in this image.
+            Respond with only the common name of the animal, for example: 'Lion' or 'Bengal Tiger'.
+            Do not add any other text, explanation, or punctuation.
+        """
     }
 
     // UI Setup
@@ -72,23 +78,23 @@ class ResultActivity : AppCompatActivity() {
         }
     }
 
-    /** Sets up click listeners for Baidu API and detail page buttons. */
+    /** Sets up click listeners for Gemini API and detail page buttons. */
     private fun setupClickListeners() {
         binding.btnDetailPage.setOnClickListener {
             val url = when (val state = recognitionState) {
-                is RecognitionState.Result -> if (state.isShowingBaidu) state.baiduDetailUrl else state.localDetailUrl
+                is RecognitionState.Result -> if (state.isShowingRemote) state.remoteDetailUrl else state.localDetailUrl
                 else -> null
             }
             url?.let {
                 startActivity(Intent(this, InfoActivity::class.java).putExtra("url", it))
             } ?: Toast.makeText(this, "No valid URL available", Toast.LENGTH_SHORT).show()
         }
-        binding.btnBaiduApi.setOnClickListener {
+        binding.btnGeminiApi.setOnClickListener {
             when (val state = recognitionState) {
-                is RecognitionState.Initial -> fetchBaiduResult()
+                is RecognitionState.Initial -> fetchGeminiResult()
                 is RecognitionState.Result -> {
-                    if (state.baiduAnimalType == null) {
-                        fetchBaiduResult()
+                    if (state.remoteAnimalType == null) {
+                        fetchGeminiResult()
                     } else {
                         toggleRecognitionResult()
                     }
@@ -96,48 +102,80 @@ class ResultActivity : AppCompatActivity() {
             }
         }
     }
-    /** Switches UI to display Baidu recognition result. */
+    /** Switches UI to display Gemini recognition result. */
     private fun toggleRecognitionResult() {
         recognitionState = when (val current = recognitionState) {
-            is RecognitionState.Result -> current.copy(isShowingBaidu = !current.isShowingBaidu)
+            is RecognitionState.Result -> current.copy(isShowingRemote = !current.isShowingRemote)
             else -> current
         }
         showResult()
     }
 
 
-    // Baidu API Integration
-    /** Fetches Baidu API recognition result for the image. */
-    private fun fetchBaiduResult() {
+    /** Fetches Gemini API recognition result for the image. */
+    private fun fetchGeminiResult() {
         lifecycleScope.launch {
             binding.loadingLayout.visibility = View.VISIBLE
             try {
                 val bitmap = loadBitmapFromUri(Uri.parse(intent.getStringExtra("imageUri")!!))
                     ?: throw Exception("Image load failed")
+
+                // This function is reused from your old code
                 val base64Image = encodeImageToBase64(bitmap)
+
+                // 1. Build the Gemini Request Body
+                // We send both the prompt and the inline image data
+                val geminiRequest = GeminiRequest(
+                    contents = listOf(
+                        Content(
+                            parts = listOf(
+                                Part(text = GEMINI_PROMPT),
+                                Part(inlineData = InlineData(mimeType = "image/jpeg", data = base64Image))
+                            )
+                        )
+                    )
+                )
+
+                // 2. Call the Gemini API (using IO Dispatcher)
                 val response = withContext(Dispatchers.IO) {
-                    BaiduApiClient.api.recognizeAnimal(accessToken, base64Image).await()
+                    GeminiApiClient.api.generateContent(geminiRequest, geminiApiKey)
                 }
 
-                val animal = response.result?.firstOrNull() ?: throw Exception("No Baidu result")
+                // 3. Parse the Gemini Response
+                // The animal name is in the text of the first candidate's first part
+                val animalName = response.candidates?.firstOrNull()
+                    ?.content?.parts?.firstOrNull()
+                    ?.text?.trim() // .trim() is important to remove newlines
+                    ?: throw Exception("Gemini returned no text or invalid response format")
+
+                if (animalName.isBlank()) {
+                    throw Exception("Gemini returned blank text")
+                }
+
+                // 4. (REUSE) Now, fetch the Wikipedia intro for the name Gemini gave us
+                val animalIntro = fetchWikiIntro(animalName)
+                val wikipediaUrl = "https://en.wikipedia.org/wiki/$animalName"
+
+                // 5. Update the state with the new remote data
                 recognitionState = when (val current = recognitionState) {
                     is RecognitionState.Result -> current.copy(
-                        baiduAnimalType = animal.name,
-                        baiduAnimalIntro = animal.baike_info?.description ?: "No description",
-                        baiduDetailUrl = "https://baike.baidu.com/item/${animal.name}",
-                        isShowingBaidu = true
+                        remoteAnimalType = animalName,
+                        remoteAnimalIntro = animalIntro,
+                        remoteDetailUrl = wikipediaUrl,
+                        isShowingRemote = true
                     )
                     else -> RecognitionState.Result(
-                        baiduAnimalType = animal.name,
-                        baiduAnimalIntro = animal.baike_info?.description ?: "No description",
-                        baiduDetailUrl = "https://baike.baidu.com/item/${animal.name}",
-                        isShowingBaidu = true
+                        remoteAnimalType = animalName,
+                        remoteAnimalIntro = animalIntro,
+                        remoteDetailUrl = wikipediaUrl,
+                        isShowingRemote = true
                     )
                 }
                 showResult()
                 bitmap.recycle()
             } catch (e: Exception) {
-                handleError("Network error, please try again later ${e.message}")
+                // Error message will now show Gemini errors
+                handleError("Gemini API error, please try again later: ${e.message}")
             } finally {
                 binding.loadingLayout.visibility = View.GONE
             }
@@ -312,7 +350,7 @@ class ResultActivity : AppCompatActivity() {
 
 
 
-    /** Encodes bitmap to Base64 for Baidu API. */
+    /** Encodes bitmap to Base64 for Gemini API. */
     private fun encodeImageToBase64(bitmap: Bitmap): String {
         val stream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
@@ -343,20 +381,20 @@ class ResultActivity : AppCompatActivity() {
             is RecognitionState.Result -> {
                 if (state.localAnimalType == "Could not recognize an animal in the picture") {
                     binding.recognitionResult.text = "Result: Could not recognize an animal in the picture"
-                    binding.baiduInfo.text = "Could not recognize an animal in the picture"
-                    binding.btnBaiduApi.visibility = View.GONE
+                    binding.GeminiInfo.text = "Could not recognize an animal in the picture"
+                    binding.btnGeminiApi.visibility = View.GONE
                     binding.btnDetailPage.visibility = View.GONE
-                } else if (state.isShowingBaidu && state.baiduAnimalType != null) {
-                    binding.recognitionResult.text = "Result: ${state.baiduAnimalType}"
-                    binding.baiduInfo.text = state.baiduAnimalIntro ?: ""
-                    binding.btnBaiduApi.text = "View Local Result"
-                    binding.btnBaiduApi.visibility = View.VISIBLE
+                } else if (state.isShowingRemote && state.remoteAnimalType != null) {
+                    binding.recognitionResult.text = "Result: ${state.remoteAnimalType}"
+                    binding.GeminiInfo.text = state.remoteAnimalIntro ?: ""
+                    binding.btnGeminiApi.text = "View Local Result"
+                    binding.btnGeminiApi.visibility = View.VISIBLE
                     binding.btnDetailPage.visibility = View.VISIBLE
                 } else if (state.localAnimalType != null) {
                     binding.recognitionResult.text = "Result: ${state.localAnimalType}"
-                    binding.baiduInfo.text = state.localAnimalIntro ?: ""
-                    binding.btnBaiduApi.text = "View Baidu Result"
-                    binding.btnBaiduApi.visibility = View.VISIBLE
+                    binding.GeminiInfo.text = state.localAnimalIntro ?: ""
+                    binding.btnGeminiApi.text = "View Gemini Result"
+                    binding.btnGeminiApi.visibility = View.VISIBLE
                     binding.btnDetailPage.visibility = View.VISIBLE
                 } else {
                     handleError("No recognition result available")
@@ -439,10 +477,10 @@ class ResultActivity : AppCompatActivity() {
             val localAnimalType: String? = null,
             val localAnimalIntro: String? = null,
             val localDetailUrl: String? = null,
-            val baiduAnimalType: String? = null,
-            val baiduAnimalIntro: String? = null,
-            val baiduDetailUrl: String? = null,
-            val isShowingBaidu: Boolean = false
+            val remoteAnimalType: String? = null,
+            val remoteAnimalIntro: String? = null,
+            val remoteDetailUrl: String? = null,
+            val isShowingRemote: Boolean = false
         ) : RecognitionState()
     }
 }

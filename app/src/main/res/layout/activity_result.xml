@@ -55,7 +55,7 @@
                 android:textColor="?android:attr/textColorPrimary" />
 
             <TextView
-                android:id="@+id/baiduTitle"
+                android:id="@+id/GeminiTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Details"
@@ -67,12 +67,12 @@
                 android:textColor="?android:attr/textColorSecondary"
                 android:gravity="center"/>
             <TextView
-                android:id="@+id/baiduInfo"
+                android:id="@+id/GeminiInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:text="@string/sample_baike_info"
                 android:textSize="17sp"
-                app:layout_constraintTop_toBottomOf="@+id/baiduTitle"
+                app:layout_constraintTop_toBottomOf="@+id/GeminiTitle"
                 android:layout_marginTop="2dp"
                 android:paddingBottom="100dp"
                 android:layout_marginStart="12dp"
@@ -85,14 +85,14 @@
 
     <!-- 左侧按钮：调用百度 API，使用普通 Button 替代 MaterialButton -->
     <Button
-        android:id="@+id/btnBaiduApi"
+        android:id="@+id/btnGeminiApi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
-        android:text="Baidu Recognition"
+        android:text="Gemini Recognition"
         android:textColor="#FFFFFF"
         android:layout_gravity="center"
         android:backgroundTint="@color/colorAccent2" />
