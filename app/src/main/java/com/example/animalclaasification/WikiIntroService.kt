@@ -1,16 +1,17 @@
+
 package com.example.animalclaasification
 
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Query
-import com.example.animalclaasification.BuildConfig
+import retrofit2.http.Path
 
-
-interface BaikeIntroService {
-    @GET("baikebaidu.php")
-    fun fetchBaikeIntro(
-        @Query("id") id: String = "10002800",  // 固定 ID
-        @Query("key") key: String = BuildConfig.BAIKE_API_KEY,  // API Key
-        @Query("words") animalType: String // 需要查询的动物类型
-    ): Call<BaikeIntroResponse>
+interface WikiIntroService {
+    /**
+     * Fetches the summary for a given page title (animal name).
+     * Example URL: https://en.wikipedia.org/api/rest_v1/page/summary/Lion
+     */
+    @GET("page/summary/{animalName}")
+    fun fetchSummary(
+        @Path("animalName") animalName: String // The name of the animal to query
+    ): Call<WikiIntroResponse>
 }
