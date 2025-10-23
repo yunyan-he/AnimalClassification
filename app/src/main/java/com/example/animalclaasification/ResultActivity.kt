@@ -216,12 +216,12 @@ class ResultActivity : AppCompatActivity() {
 
                 val finalIndex = detailedIndex ?: index
                 val animalType = getAnimalName(finalIndex, detailedIndex != null)
-                val animalIntro = fetchBaiduIntro(animalType)
+                val animalIntro = fetchWikiIntro(animalType)
 
                 recognitionState = RecognitionState.Result(
                     localAnimalType = animalType,
                     localAnimalIntro = animalIntro,
-                    localDetailUrl = "https://baike.baidu.com/item/$animalType"
+                    localDetailUrl = "https://en.wikipedia.org/wiki/$animalType"
                 )
                 showResult()
                 bitmap.recycle() // Free memory
@@ -322,12 +322,17 @@ class ResultActivity : AppCompatActivity() {
     }
 
     /** Fetches encyclopedia introduction for the animal type. */
-    private suspend fun fetchBaiduIntro(animalType: String): String = withContext(Dispatchers.IO) {
+    private suspend fun fetchWikiIntro(animalName: String): String = withContext(Dispatchers.IO) {
         try {
-            BaikeIntroClient.api.fetchBaikeIntro(animalType = animalType).await().description ?: "No introduction"
+            // 1. Use the new WikipediaClient
+            // 2. Call the new fetchSummary method
+            // 3. Get the 'extract' field from the response
+            val response = WikiIntroClient.api.fetchSummary(animalName = animalName).await()
+            response.extract ?: "No summary available." // Provide a default value in case extract is null
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to fetch intro: ${e.message}", e)
-            "Unable to fetch introduction"
+            // Update the log message
+            Log.e(TAG, "Failed to fetch Wikipedia summary: ${e.message}", e)
+            "Unable to fetch summary" // Return this message on error
         }
     }
 
