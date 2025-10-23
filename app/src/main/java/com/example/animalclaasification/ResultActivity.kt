@@ -221,7 +221,7 @@ class ResultActivity : AppCompatActivity() {
                 recognitionState = RecognitionState.Result(
                     localAnimalType = animalType,
                     localAnimalIntro = animalIntro,
-                    localDetailUrl = "https://baike.baidu.com/item/$animalType"
+                    localDetailUrl = "https://en.wikipedia.org/wiki/$animalType"
                 )
                 showResult()
                 bitmap.recycle() // Free memory
