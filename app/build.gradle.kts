@@ -23,6 +23,7 @@ android {
         versionName = "1.0"
         buildConfigField("String", "BAIKE_API_KEY", "\"${properties.getProperty("BAIKE_API_KEY")}\"")
         buildConfigField("String", "ACCESS_TOKEN", "\"${properties.getProperty("ACCESS_TOKEN")}\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"${properties.getProperty("GEMINI_API_KEY")}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -76,6 +77,7 @@ dependencies {
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.1") // ONNX Runtime
 
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
     implementation("com.google.android.material:material:1.12.0")
 
 }
